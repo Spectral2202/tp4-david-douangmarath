@@ -74,7 +74,22 @@ const login = async (req, res) => {
       });
     }
 
-    createSendToken(user, 200, res);
+    const token = signToken(user._id, user.role);
+
+    res.status(200).json({
+      status: "success",
+      token,
+      data: {
+        userId: user._id,
+        role: user.role,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      },
+    });
   } catch (err) {
     res.status(500).json({
       status: "error",
