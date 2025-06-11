@@ -148,6 +148,20 @@ const restrictTo = (...roles) => {
   };
 };
 
+const verifyToken = protect;
+
+const checkRole = (role) => {
+  return (req, res, next) => {
+    if (req.user.role !== role) {
+      return res.status(403).json({
+        status: "fail",
+        message: `Access denied. ${role} role required.`,
+      });
+    }
+    next();
+  };
+};
+
 const signupAdmin = async (req, res) => {
   try {
     const { name, email, password, passwordConfirm, role } = req.body;
@@ -193,4 +207,6 @@ module.exports = {
   login,
   protect,
   restrictTo,
+  verifyToken,
+  checkRole,
 };

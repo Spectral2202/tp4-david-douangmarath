@@ -10,21 +10,21 @@ router
 
 router
   .route('/tour-stats')
-  .get(authController.protect, authController.restrictTo('admin', 'moderator'), tourController.getTourStats);
+  .get(authController.verifyToken, authController.restrictTo('admin', 'moderator'), tourController.getTourStats);
 
 router
   .route('/monthly-plan/:year')
-  .get(authController.protect, authController.restrictTo('admin', 'moderator'), tourController.getMonthlyPlan);
+  .get(authController.verifyToken, authController.restrictTo('admin', 'moderator'), tourController.getMonthlyPlan);
 
 router
   .route('/')
   .get(tourController.getAllTours)
-  .post(authController.protect, authController.restrictTo('admin', 'moderator'), tourController.createTour);
+  .post(authController.verifyToken, authController.restrictTo('admin', 'moderator'), tourController.createTour);
 
 router
   .route('/:id')
   .get(tourController.getTour)
-  .patch(authController.protect, authController.restrictTo('admin', 'moderator'), tourController.updateTour)
-  .delete(authController.protect, authController.restrictTo('admin'), tourController.deleteTour);
+  .patch(authController.verifyToken, authController.restrictTo('admin', 'moderator'), tourController.updateTour)
+  .delete(authController.verifyToken, authController.checkRole('admin'), tourController.deleteTour);
 
 module.exports = router;
