@@ -1,8 +1,8 @@
 const userService = require('../services/user.service');
 
-const getAllUsers = (req, res) => {
+const getAllUsers = async (req, res) => {
   try {
-    const users = userService.getAllUsers();
+    const users = await userService.getAllUsers();
     res.status(200).json({
       status: 'success',
       results: users.length,
@@ -11,14 +11,15 @@ const getAllUsers = (req, res) => {
   } catch (err) {
     res.status(500).json({
       status: 'error',
-      message: 'Error fetching users',
+      message: err.message,
     });
   }
 };
 
-const getUser = (req, res) => {
+const getUser = async (req, res) => {
   try {
-    const user = userService.getUserById(parseInt(req.params.id));
+    const id = process.env.USE_MONGO === 'true' ? req.params.id : parseInt(req.params.id);
+    const user = await userService.getUserById(id);
 
     if (!user) {
       return res.status(404).json({
@@ -34,21 +35,14 @@ const getUser = (req, res) => {
   } catch (err) {
     res.status(500).json({
       status: 'error',
-      message: 'Error fetching user',
+      message: err.message,
     });
   }
 };
 
-const createUser = (req, res) => {
+const createUser = async (req, res) => {
   try {
-    const requiredFields = [
-      'name',
-      'email',
-      'role',
-      'active',
-      'password',
-      'photo',
-    ];
+    const requiredFields = ['name', 'email', 'password', 'passwordConfirm'];
     const missingFields = requiredFields.filter((field) => !req.body[field]);
 
     if (missingFields.length > 0) {
@@ -58,26 +52,24 @@ const createUser = (req, res) => {
       });
     }
 
-    const newUser = userService.createUser(req.body);
+    const newUser = await userService.createUser(req.body);
 
     res.status(201).json({
       status: 'success',
       data: { user: newUser },
     });
   } catch (err) {
-    res.status(500).json({
-      status: 'error',
-      message: 'Error creating user',
+    res.status(400).json({
+      status: 'fail',
+      message: err.message,
     });
   }
 };
 
-const updateUser = (req, res) => {
+const updateUser = async (req, res) => {
   try {
-    const updatedUser = userService.updateUser(
-      parseInt(req.params.id),
-      req.body
-    );
+    const id = process.env.USE_MONGO === 'true' ? req.params.id : parseInt(req.params.id);
+    const updatedUser = await userService.updateUser(id, req.body);
 
     if (!updatedUser) {
       return res.status(404).json({
@@ -91,16 +83,17 @@ const updateUser = (req, res) => {
       data: { user: updatedUser },
     });
   } catch (err) {
-    res.status(500).json({
-      status: 'error',
-      message: 'Error updating user',
+    res.status(400).json({
+      status: 'fail',
+      message: err.message,
     });
   }
 };
 
-const deleteUser = (req, res) => {
+const deleteUser = async (req, res) => {
   try {
-    const deletedUser = userService.deleteUser(parseInt(req.params.id));
+    const id = process.env.USE_MONGO === 'true' ? req.params.id : parseInt(req.params.id);
+    const deletedUser = await userService.deleteUser(id);
 
     if (!deletedUser) {
       return res.status(404).json({
@@ -114,9 +107,9 @@ const deleteUser = (req, res) => {
       data: null,
     });
   } catch (err) {
-    res.status(500).json({
-      status: 'error',
-      message: 'Error deleting user',
+    res.status(400).json({
+      status: 'fail',
+      message: err.message,
     });
   }
 };

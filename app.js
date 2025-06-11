@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const userRouter = require('./routes/user.route');
 const tourRouter = require('./routes/tour.route');
+const authRouter = require('./routes/auth.route');
 const mongoose = require('mongoose');
 
 const dotenv = require('dotenv');
@@ -28,6 +29,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
 
